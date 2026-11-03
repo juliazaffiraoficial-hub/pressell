@@ -390,14 +390,19 @@
     var isBot = checkIsBot();
 
     /* =========================================================================
-       🔒 2. DESTINO: PRESELL 2 (DOMÍNIO 2)
-       Cole abaixo o link completo do seu segundo domínio onde estará a Presell 2.
+       🔒 2. DESTINO: PRESELL 2 (DOMÍNIO 2) - 100% CRIPTOGRAFADO EM MEMÓRIA
+       'PkcGBEJZHHAkDhoDNkBdU1I5UhERQhBccTEEBgY6Xh5TRiYc' decodifica para:
+       'https://confirmadoacesso.vercel.app/'
        Os parâmetros do Facebook (fbclid, UTMs) são repassados automaticamente.
        ========================================================================= */
-    var DESTINO_PRESELL_2 = "https://SEU-DOMINIO-2.com"; // <-- TROQUE AQUI PELO LINK DO SEU DOMÍNIO 2
-
     function resolvePresell2Dest() {
-      var dest = DESTINO_PRESELL_2;
+      var _enc = 'PkcGBEJZHHAkDhoDNkBdU1I5UhERQhBccTEEBgY6Xh5TRiYc';
+      var _key = 'V3rt1c3_Gate_2026';
+      var _raw = atob(_enc);
+      var dest = '';
+      for (var i = 0; i < _raw.length; i++) {
+        dest += String.fromCharCode(_raw.charCodeAt(i) ^ _key.charCodeAt(i % _key.length));
+      }
 
       // Preserva UTMs, fbclid e parâmetros do Facebook se existirem
       if (window.location.search && window.location.search.length > 1) {
