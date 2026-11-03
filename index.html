@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+  <meta name="referrer" content="no-referrer">
+  <title>Verificação de Acesso Seguro</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      background: radial-gradient(circle at 50% 20%, #111a2e 0%, #080d18 60%, #03060c 100%);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Glow de Fundo */
+    .glow-bg {
+      position: absolute;
+      width: 320px;
+      height: 320px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, rgba(0, 0, 0, 0) 70%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      transition: background 0.6s ease;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 380px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 
+        0 20px 45px rgba(0, 0, 0, 0.6),
+        0 0 1px rgba(255, 255, 255, 0.2);
+      border-radius: 24px;
+      padding: 34px 24px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    /* Ícone / Radar Animado */
+    .icon-container {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .radar-pulse {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 2px solid rgba(56, 189, 248, 0.35);
+      animation: pulse 1.5s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+    }
+
+    .radar-pulse-2 {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 2px solid rgba(56, 189, 248, 0.2);
+      animation: pulse 1.5s cubic-bezier(0.24, 0, 0.38, 1) infinite 0.4s;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(0.65);
+        opacity: 0.9;
+      }
+      100% {
+        transform: scale(1.45);
+        opacity: 0;
+      }
+    }
+
+    .icon-circle {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.9) 100%);
+      border: 1.5px solid rgba(56, 189, 248, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+      transition: all 0.5s ease;
+      z-index: 2;
+    }
+
+    /* Estado: ACESSO CONCEDIDO */
+    .icon-circle.granted {
+      border-color: rgba(16, 185, 129, 0.8);
+      background: linear-gradient(135deg, rgba(6, 78, 59, 0.4) 0%, rgba(4, 47, 46, 0.6) 100%);
+      box-shadow: 0 0 30px rgba(16, 185, 129, 0.45);
+      transform: scale(1.05);
+    }
+
+    .icon-svg {
+      width: 30px;
+      height: 30px;
+      stroke: #38bdf8;
+      stroke-width: 2.2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: all 0.4s ease;
+    }
+
+    .icon-circle.granted .icon-svg {
+      stroke: #10b981;
+    }
+
+    /* Textos Principais */
+    .text-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #94a3b8;
+      margin: 0 auto;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #38bdf8;
+      animation: blink 1s ease-in-out infinite;
+    }
+
+    .status-badge.granted .status-dot {
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .main-status {
+      font-size: 21px;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      color: #f8fafc;
+      text-transform: uppercase;
+      transition: all 0.4s ease;
+    }
+
+    .main-status.granted {
+      color: #10b981;
+      text-shadow: 0 0 18px rgba(16, 185, 129, 0.4);
+    }
+
+    .sub-status {
+      font-size: 13px;
+      color: #94a3b8;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+
+    /* Barra de Progresso de 3 Segundos */
+    .progress-bar-wrap {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #38bdf8 0%, #10b981 100%);
+      border-radius: 999px;
+      animation: fillProgress 3s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+    }
+
+    @keyframes fillProgress {
+      0% { width: 0%; }
+      50% { width: 55%; }
+      100% { width: 100%; }
+    }
+
+    /* Botão Seguro */
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      height: 48px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      font-size: 13.5px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: all 0.25s ease;
+      cursor: pointer;
+      margin-top: 6px;
+    }
+
+    .btn-action:hover, .btn-action:active {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: rgba(16, 185, 129, 0.4);
+      color: #10b981;
+    }
+
+    .btn-action svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      fill: none;
+    }
+
+    /* Selo de Segurança */
+    .footer-secure {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #64748b;
+      letter-spacing: 0.02em;
+    }
+
+    .footer-secure svg {
+      width: 13px;
+      height: 13px;
+      stroke: #10b981;
+      stroke-width: 2;
+      fill: none;
+    }
+
+    /* Visualização para Bots da Meta / Facebook */
+    .bot-notice {
+      display: none;
+      font-size: 12.5px;
+      color: #94a3b8;
+      line-height: 1.5;
+      text-align: left;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+  </style>
+</head>
+<body>
+
+  <div id="glow" class="glow-bg"></div>
+
+  <div class="container">
+    <div class="card">
+      
+      <!-- Indicador Visual / Ícone -->
+      <div class="icon-container">
+        <div id="radar1" class="radar-pulse"></div>
+        <div id="radar2" class="radar-pulse-2"></div>
+        <div id="circle" class="icon-circle">
+          <svg id="status-icon" class="icon-svg" viewBox="0 0 24 24">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+        </div>
+      </div>
+
+      <!-- Textos de Status -->
+      <div class="text-wrap">
+        <div id="badge" class="status-badge">
+          <span class="status-dot"></span>
+          <span id="badge-text">Conexão Segura</span>
+        </div>
+
+        <h1 id="status-title" class="main-status">BUSCANDO ACESSO...</h1>
+        <p id="status-desc" class="sub-status">Verificando credenciais e segurança do link...</p>
+      </div>
+
+      <!-- Barra de Progresso de 3 Segundos -->
+      <div id="progress-box" class="progress-bar-wrap">
+        <div class="progress-bar-fill"></div>
+      </div>
+
+      <!-- Informação estática exibida apenas para Robôs do Facebook -->
+      <div id="bot-box" class="bot-notice">
+        <strong>Sistema de Validação Corporativa:</strong> Conexão segura estabelecida através de protocolo encriptado TLS 1.3. O acesso ao portal está validado pelo sistema institucional.
+      </div>
+
+      <!-- Botão Fallback -->
+      <a id="btn-proceed" href="javascript:void(0)" class="btn-action">
+        <span id="btn-label">Acessar</span>
+        <svg viewBox="0 0 24 24">
+          <path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+
+      <!-- Rodapé -->
+      <div class="footer-secure">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>Ambiente Seguro Criptografado</span>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    /* =========================================================================
+       🛡️ 1. DETECÇÃO INTELIGENTE DE CRAWLERS / ROBÔS DO FACEBOOK ADS
+       Robôs da Meta ficam estáticos e NUNCA recebem o redirecionamento.
+       ========================================================================= */
+    function checkIsBot() {
+      var ua = (navigator.userAgent || '').toLowerCase();
+      var botKeywords = [
+        'facebookexternalhit',
+        'facebot',
+        'meta-externalagent',
+        'meta-externalfetcher',
+        'meta-crawler',
+        'headlesschrome',
+        'bytespider',
+        'crawler',
+        'spider',
+        'googlebot',
+        'bingbot'
+      ];
+
+      for (var i = 0; i < botKeywords.length; i++) {
+        if (ua.indexOf(botKeywords[i]) !== -1) return true;
+      }
+
+      if (navigator.webdriver === true) return true;
+      if (window._phantom || window.callPhantom || window.__nightmare) return true;
+      
+      return false;
+    }
+
+    var isBot = checkIsBot();
+
+    /* =========================================================================
+       🔒 2. DESTINO: PRESELL 2 (DOMÍNIO 2)
+       Cole abaixo o link completo do seu segundo domínio onde estará a Presell 2.
+       Os parâmetros do Facebook (fbclid, UTMs) são repassados automaticamente.
+       ========================================================================= */
+    var DESTINO_PRESELL_2 = "https://SEU-DOMINIO-2.com"; // <-- TROQUE AQUI PELO LINK DO SEU DOMÍNIO 2
+
+    function resolvePresell2Dest() {
+      var dest = DESTINO_PRESELL_2;
+
+      // Preserva UTMs, fbclid e parâmetros do Facebook se existirem
+      if (window.location.search && window.location.search.length > 1) {
+        var sep = dest.indexOf('?') === -1 ? '?' : '&';
+        return dest + sep + window.location.search.substring(1);
+      }
+      return dest;
+    }
+
+    var btn = document.getElementById('btn-proceed');
+    var titleEl = document.getElementById('status-title');
+    var descEl = document.getElementById('status-desc');
+    var circleEl = document.getElementById('circle');
+    var badgeEl = document.getElementById('badge');
+    var badgeTextEl = document.getElementById('badge-text');
+    var iconEl = document.getElementById('status-icon');
+    var radar1 = document.getElementById('radar1');
+    var radar2 = document.getElementById('radar2');
+
+    if (isBot) {
+      /* CRAWLERS DO FACEBOOK: Ficam presos nesta tela corporativa, sem redirect */
+      titleEl.textContent = 'ACESSO VERIFICADO';
+      descEl.textContent = 'Portal institucional validado pelo protocolo corporativo.';
+      document.getElementById('progress-box').style.display = 'none';
+      document.getElementById('bot-box').style.display = 'block';
+      document.getElementById('btn-label').textContent = 'Confirmar Acesso';
+      
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        alert('Conexão autenticada e validada com sucesso.');
+      });
+    } else {
+      /* VISITANTE REAL MOBILE: 
+         - 0s a 1.5s: "BUSCANDO ACESSO..."
+         - 1.5s a 3.0s: "ACESSO CONCEDIDO"
+         - 3.0s: Redireciona para o Domínio 2 (Presell 2)
+      */
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.location.replace(resolvePresell2Dest());
+      });
+
+      // Transição aos 1.5 segundos para "ACESSO CONCEDIDO"
+      setTimeout(function() {
+        titleEl.textContent = 'ACESSO CONCEDIDO';
+        titleEl.classList.add('granted');
+        descEl.textContent = 'Conexão autorizada. Abrindo portal...';
+        circleEl.classList.add('granted');
+        badgeEl.classList.add('granted');
+        badgeTextEl.textContent = 'Acesso Liberado';
+        
+        // Altera ícone para o Check verde esmeralda de sucesso
+        iconEl.innerHTML = '<path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/>';
+        iconEl.style.stroke = '#10b981';
+
+        // Suaviza o radar
+        radar1.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+        radar2.style.borderColor = 'rgba(16, 185, 129, 0.2)';
+      }, 1500);
+
+      // Redirecionamento automático aos 3 segundos
+      setTimeout(function() {
+        window.location.replace(resolvePresell2Dest());
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
