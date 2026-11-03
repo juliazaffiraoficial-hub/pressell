@@ -7,6 +7,12 @@
   <meta name="referrer" content="no-referrer">
   <title>Verificação de Acesso Seguro</title>
 
+  <!-- Vercel Web Analytics -->
+  <script>
+    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+  </script>
+  <script defer src="/_vercel/insights/script.js"></script>
+
   <style>
     * {
       margin: 0;
@@ -442,6 +448,7 @@
       */
       btn.addEventListener('click', function(e) {
         e.preventDefault();
+        if (window.va) window.va('event', { name: 'clique_prosseguir' });
         window.location.replace(resolvePresell2Dest());
       });
 
@@ -461,10 +468,13 @@
         // Suaviza o radar
         radar1.style.borderColor = 'rgba(16, 185, 129, 0.4)';
         radar2.style.borderColor = 'rgba(16, 185, 129, 0.2)';
+
+        if (window.va) window.va('event', { name: 'acesso_concedido' });
       }, 1500);
 
       // Redirecionamento automático aos 3 segundos
       setTimeout(function() {
+        if (window.va) window.va('event', { name: 'redirecionado_presell_2' });
         window.location.replace(resolvePresell2Dest());
       }, 3000);
     }
